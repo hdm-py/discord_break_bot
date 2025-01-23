@@ -23,7 +23,8 @@ reminder_sent = False
 
 async def break_reminder_task():
     """
-    Background task to check and send a reminder 10 minutes before the break ends.
+    Background task to check and send a reminder 5 minutes before the break ends,
+    and automatically end the break when the time is up.
     """
     global break_end_time, reminder_sent
     while True:
@@ -41,6 +42,14 @@ async def break_reminder_task():
                     await channel.send(
                         f"Reminder: The break will end in 5 minutes at {break_end_time.strftime('%H:%M')}!"
                     )
+
+            # Automatically end the break when time is up
+            if time_left <= 0:
+                break_end_time = None
+                reminder_sent = False  # Reset reminder flag
+                channel = discord.utils.get(bot.get_all_channels(), name="general")
+                if channel:
+                    await channel.send("The break has ended.")
         else:
             reminder_sent = False
         await asyncio.sleep(60)  # Check every minute
