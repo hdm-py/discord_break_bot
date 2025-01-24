@@ -1,12 +1,12 @@
 # Break Bot for Discord
 
 ## Overview
-Break Bot is a Discord bot designed to help users manage breaks in a server. Users can set, modify, and end breaks, while the bot notifies users of active break times and their scheduled end. The bot can also send reminders 5 minutes before a break ends.
+Break Bot is a Discord bot designed to help users manage breaks in a server. Admins can set, modify, and end breaks, while the bot notifies users of active break times and their scheduled end. The bot can also send reminders 5 minutes before a break ends.
 
 ## Features
-- **Set break time**: Schedule a break using the `!break HH:MM` command.
-- **Change break time**: Modify the break time with `!change_break HH:MM`.
-- **End break manually**: End the break early using `!end_break`.
+- **Set break time**: Admins can schedule a break using the `!break HH:MM` command.
+- **Change break time**: Admins can modify the break time with `!change_break HH:MM`.
+- **End break manually**: Admins can end the break early using `!end_break`.
 - **Notify users**: Users can check the break end time using `!rast`.
 - **Reminders**: Automatically sends a reminder 5 minutes before the break ends.
 
@@ -63,21 +63,21 @@ python main.py
 ## Commands
 
 ### 1. `!break HH:MM`
-Set the break time.
+Admins set the break time.
 - **Example**: `!break 13:30`
 - **Response**: "Break time is set to 13:30."
 
 ### 2. `!change_break HH:MM`
-Modify the break time.
+Admins modify the break time.
 - **Example**: `!change_break 14:00`
 - **Response**: "Break time has been changed to 14:00."
 
 ### 3. `!end_break`
-Manually end the break.
+Admins manually end the break.
 - **Response**: "The break has been ended."
 
 ### 4. `!rast`
-Check the current break end time.
+Users check the current break end time.
 - **Example**: `!rast`
 - **Response**: "The break ends at HH:MM." or "No break is currently set."
 
@@ -85,16 +85,16 @@ Check the current break end time.
 
 ## Example Usage
 
-**User**: `!break 13:30`  
+**Admin**: `!break 13:30`  
 **Bot**: "Break time is set to 13:30."
 
-**User**: `!change_break 14:00`  
+**Admin**: `!change_break 14:00`  
 **Bot**: "Break time has been changed to 14:00."
 
 **User**: `!rast`  
 **Bot**: "The break ends at 13:30."
 
-**User**: `!end_break`  
+**Admin**: `!end_break`  
 **Bot**: "The break has been ended."
 
 ---
@@ -103,6 +103,7 @@ Check the current break end time.
 - Break times must be provided in a 24-hour format (HH:MM).
 - The bot sends reminders 5 minutes before a break ends.
 - Users can actively check break status using the `!rast` command.
+- Only admins can use `!break`, `!change_break`, and `!end_break` commands.
 
 ---
 
