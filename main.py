@@ -62,6 +62,7 @@ async def on_ready():
     bot.loop.create_task(break_reminder_task())
 
 @bot.command(name="break")
+@commands.has_permissions(administrator=True)
 async def set_break(ctx, time: str):
     """
     Sets the break end time.
@@ -75,6 +76,7 @@ async def set_break(ctx, time: str):
         await ctx.send("Please provide the time in HH:MM format, e.g., !break 13:30.")
 
 @bot.command(name="change_break")
+@commands.has_permissions(administrator=True)
 async def change_break(ctx, time: str):
     """
     Changes the break end time.
@@ -89,6 +91,7 @@ async def change_break(ctx, time: str):
         await ctx.send("Please provide the time in HH:MM format, e.g., !change_break 14:00.")
 
 @bot.command(name="end_break")
+@commands.has_permissions(administrator=True)
 async def end_break(ctx):
     """
     Ends the break manually.
@@ -109,6 +112,16 @@ async def get_break_time(ctx):
         await ctx.send(f"The break ends at {break_end_time.strftime('%H:%M')}.")
     else:
         await ctx.send("No break is currently set.")
+
+@bot.event
+async def on_command_error(ctx, error):
+    """
+    Handles errors for commands, including missing permissions.
+    """
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("You do not have permission to use this command.")
+    else:
+        raise error
 
 @bot.event
 async def on_message(message):
