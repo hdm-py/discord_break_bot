@@ -1,17 +1,24 @@
 # Break Bot for Discord
 
 ## Overview
-Break Bot is a Discord bot designed to help users manage breaks in a server. Admins can set, modify, and end breaks, while the bot notifies users of active break times and their scheduled end. The bot can also send reminders 5 minutes before a break ends.
+Break Bot is a Discord bot designed to help manage breaks in a server. Admins can set, modify, and end breaks, while the bot notifies users of active break times and their scheduled end. The bot also sends reminders 5 minutes before a break ends.
+
+---
 
 ## Features
+
 - **Set break time**: Admins can schedule a break using the `!break HH:MM` command.
 - **Change break time**: Admins can modify the break time with `!change_break HH:MM`.
 - **End break manually**: Admins can end the break early using `!end_break`.
 - **Notify users**: Users can check the break end time using `!rast`.
 - **Reminders**: Automatically sends a reminder 5 minutes before the break ends.
+- **Permission management**: Add or remove users who can use admin commands.
+
+---
 
 ## Prerequisites
-- Python 3.8+
+
+- Python 3.8 or higher
 - `discord.py` library
 - `.env` file containing the bot's token
 
@@ -28,7 +35,7 @@ cd discord_bot_break
 ```
 
 ### 2. Set Up a Virtual Environment
-It is recommended to create a virtual environment to manage dependencies:
+Create a virtual environment to manage dependencies:
 
 ```bash
 python -m venv venv
@@ -36,7 +43,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
-Ensure you have all the required Python packages by installing the dependencies from `requirements.txt`:
+Install the required Python packages:
 
 ```bash
 pip install -r requirements.txt
@@ -62,24 +69,40 @@ python main.py
 
 ## Commands
 
-### 1. `!break HH:MM`
-Admins set the break time.
+### Admin Commands
+
+#### 1. `!break HH:MM`
+Sets the break end time.
 - **Example**: `!break 13:30`
 - **Response**: "Break time is set to 13:30."
 
-### 2. `!change_break HH:MM`
-Admins modify the break time.
+#### 2. `!change_break HH:MM`
+Changes the break end time.
 - **Example**: `!change_break 14:00`
 - **Response**: "Break time has been changed to 14:00."
 
-### 3. `!end_break`
-Admins manually end the break.
+#### 3. `!end_break`
+Ends the break manually.
 - **Response**: "The break has been ended."
 
-### 4. `!rast`
-Users check the current break end time.
+#### 4. `!add_permission @user`
+Grants a user permission to use admin commands.
+- **Response**: "@user has been granted permission."
+
+#### 5. `!remove_permission @user`
+Removes a user’s permission to use admin commands.
+- **Response**: "@user's permission has been removed."
+
+#### 6. `!show_permissions`
+Displays a list of users with admin permissions.
+- **Response**: "Authorized users: @user1, @user2."
+
+### User Commands
+
+#### 1. `!rast`
+Displays the current break end time.
 - **Example**: `!rast`
-- **Response**: "The break ends at HH:MM." or "No break is currently set."
+- **Response**: "The break ends at 13:30." or "No break is currently set."
 
 ---
 
@@ -92,18 +115,25 @@ Users check the current break end time.
 **Bot**: "Break time has been changed to 14:00."
 
 **User**: `!rast`  
-**Bot**: "The break ends at 13:30."
+**Bot**: "The break ends at 14:00."
 
 **Admin**: `!end_break`  
 **Bot**: "The break has been ended."
 
+**Admin**: `!add_permission @user`  
+**Bot**: "@user has been granted permission."
+
+**Admin**: `!remove_permission @user`  
+**Bot**: "@user's permission has been removed."
+
 ---
 
 ## Notes
+
 - Break times must be provided in a 24-hour format (HH:MM).
 - The bot sends reminders 5 minutes before a break ends.
 - Users can actively check break status using the `!rast` command.
-- Only admins can use `!break`, `!change_break`, and `!end_break` commands.
+- Only admins or authorized users can set, modify, or end breaks.
 
 ---
 

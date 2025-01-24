@@ -15,22 +15,25 @@ intents.messages = True
 intents.message_content = True  # Ensure message content intent is enabled
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Global variable to store the break end time
+# Global variables
 break_end_time = None
-
-# Global variable to store if a reminder has been sent
 reminder_sent = False
+authorized_users = []  # Lista över användar-ID:n med admin-behörighet
+
+def is_authorized(ctx):
+    """
+    Kontrollera om en användare är administratör eller finns i authorized_users.
+    """
+    return ctx.author.id in authorized_users or ctx.author.guild_permissions.administrator
 
 async def break_reminder_task():
     """
-    Background task to check and send a reminder 5 minutes before the break ends,
-    and automatically end the break when the time is up.
+    Kontrollera och skicka påminnelse 5 minuter innan rasten slutar och avsluta automatiskt rasten.
     """
     global break_end_time, reminder_sent
     while True:
         if break_end_time:
             current_time = datetime.now().time()
-            # Calculate time difference in minutes
             time_left = (
                 datetime.combine(datetime.today(), break_end_time) -
                 datetime.combine(datetime.today(), current_time)
@@ -42,32 +45,31 @@ async def break_reminder_task():
                     await channel.send(
                         f"Reminder: The break will end in 5 minutes at {break_end_time.strftime('%H:%M')}!"
                     )
-
-            # Automatically end the break when time is up
             if time_left <= 0:
                 break_end_time = None
-                reminder_sent = False  # Reset reminder flag
+                reminder_sent = False
                 channel = discord.utils.get(bot.get_all_channels(), name="general")
                 if channel:
                     await channel.send("The break has ended.")
         else:
             reminder_sent = False
-        await asyncio.sleep(60)  # Check every minute
+        await asyncio.sleep(60)
 
 @bot.event
 async def on_ready():
     print(f"Bot is ready. Logged in as {bot.user}")
     print(f"Loaded commands: {[command.name for command in bot.commands]}")
-    # Start the background task
     bot.loop.create_task(break_reminder_task())
 
 @bot.command(name="break")
-@commands.has_permissions(administrator=True)
 async def set_break(ctx, time: str):
     """
-    Sets the break end time.
-    Command format: !break HH:MM (24-hour format)
+    Ställ in rastens sluttid. Behörighet krävs.
     """
+    if not is_authorized(ctx):
+        await ctx.send("Du har inte behörighet att använda detta kommando.")
+        return
+
     global break_end_time
     try:
         break_end_time = datetime.strptime(time, "%H:%M").time()
@@ -76,27 +78,31 @@ async def set_break(ctx, time: str):
         await ctx.send("Please provide the time in HH:MM format, e.g., !break 13:30.")
 
 @bot.command(name="change_break")
-@commands.has_permissions(administrator=True)
 async def change_break(ctx, time: str):
     """
-    Changes the break end time.
-    Command format: !change_break HH:MM (24-hour format)
+    Ändra rastens sluttid. Behörighet krävs.
     """
+    if not is_authorized(ctx):
+        await ctx.send("Du har inte behörighet att använda detta kommando.")
+        return
+
     global break_end_time, reminder_sent
     try:
         break_end_time = datetime.strptime(time, "%H:%M").time()
-        reminder_sent = False  # Reset reminder flag
+        reminder_sent = False
         await ctx.send(f"Break time has been changed to {time}.")
     except ValueError:
         await ctx.send("Please provide the time in HH:MM format, e.g., !change_break 14:00.")
 
 @bot.command(name="end_break")
-@commands.has_permissions(administrator=True)
 async def end_break(ctx):
     """
-    Ends the break manually.
-    Command format: !end_break
+    Avsluta rasten manuellt. Behörighet krävs.
     """
+    if not is_authorized(ctx):
+        await ctx.send("Du har inte behörighet att använda detta kommando.")
+        return
+
     global break_end_time
     break_end_time = None
     await ctx.send("The break has been ended.")
@@ -104,8 +110,7 @@ async def end_break(ctx):
 @bot.command(name="rast")
 async def get_break_time(ctx):
     """
-    Returns the current break end time if one is set.
-    Command format: !rast
+    Visa rastens sluttid.
     """
     global break_end_time
     if break_end_time:
@@ -113,27 +118,50 @@ async def get_break_time(ctx):
     else:
         await ctx.send("No break is currently set.")
 
+@bot.command(name="add_permission")
+@commands.has_permissions(administrator=True)
+async def add_permission(ctx, user: discord.User):
+    """
+    Lägg till en användare i listan över auktoriserade användare.
+    """
+    if user.id not in authorized_users:
+        authorized_users.append(user.id)
+        await ctx.send(f"{user.mention} har fått behörighet att använda admin-kommandon.")
+    else:
+        await ctx.send(f"{user.mention} har redan behörighet.")
+
+@bot.command(name="remove_permission")
+@commands.has_permissions(administrator=True)
+async def remove_permission(ctx, user: discord.User):
+    """
+    Ta bort en användare från listan över auktoriserade användare.
+    """
+    if user.id in authorized_users:
+        authorized_users.remove(user.id)
+        await ctx.send(f"{user.mention} har fått sin behörighet borttagen.")
+    else:
+        await ctx.send(f"{user.mention} har inte behörighet.")
+
+@bot.command(name="show_permissions")
+@commands.has_permissions(administrator=True)
+async def show_permissions(ctx):
+    """
+    Visa en lista över alla användare med särskild behörighet.
+    """
+    if authorized_users:
+        users = [f"<@{user_id}>" for user_id in authorized_users]
+        await ctx.send(f"Användare med behörighet: {', '.join(users)}")
+    else:
+        await ctx.send("Inga extra användare har behörighet.")
+
 @bot.event
 async def on_command_error(ctx, error):
     """
-    Handles errors for commands, including missing permissions.
+    Hanterar fel för kommandon, inklusive saknade behörigheter.
     """
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have permission to use this command.")
     else:
         raise error
 
-@bot.event
-async def on_message(message):
-    """
-    Handles messages and processes only bot commands.
-    """
-    # Skip bot's own messages
-    if message.author.bot:
-        return
-
-    # Process bot commands only
-    await bot.process_commands(message)
-
-# Run the bot
 bot.run(TOKEN)
