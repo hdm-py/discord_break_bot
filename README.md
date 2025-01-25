@@ -1,124 +1,128 @@
-# Break Bot for Discord
+# Discord Bot Documentation
 
 ## Overview
-Break Bot is a Discord bot designed to help manage breaks in a server. Admins can set, modify, and end breaks, while the bot notifies users of active break times and their scheduled end. The bot also sends reminders 5 minutes before a break ends.
+This bot is designed to manage breaks in a Discord server. Administrators or authorized users can set, modify, and monitor break times. The bot will also send reminders 5 minutes before a break ends and announce when the break is over.
 
 ---
 
 ## Features
-
-- **Set break time**: Admins can schedule a break using the `!break_time HH:MM` command.
-- **Change break time**: Admins can modify the break time with `!change_break HH:MM`.
-- **End break manually**: Admins can end the break early using `!end_break`.
-- **Notify users**: Users can check the break end time using `!break`.
-- **Reminders**: Automatically sends a reminder 5 minutes before the break ends.
-- **Permission management**: Add or remove users who can use admin commands.
+1. **Set Break Time**: Define when the break will end.
+2. **Change Break Time**: Modify the existing break end time.
+3. **End Break Manually**: End the current break before the scheduled time.
+4. **Break Time Status**: Display the current break end time.
+5. **Reminders**: Notify the server 5 minutes before a break ends.
+6. **User Permissions**: Grant or revoke admin-like permissions for bot commands.
 
 ---
 
-## Prerequisites
+## Commands
 
-- Python 3.8 or higher
-- `discord.py` library
-- `.env` file containing the bot's token
+### General Commands
+
+#### `!break_time <HH:MM>`
+- **Description**: Set the break end time.
+- **Permissions**: Admin or authorized users.
+- **Example**: `!break_time 13:30`
+
+#### `!change_break <HH:MM>`
+- **Description**: Change the existing break end time.
+- **Permissions**: Admin or authorized users.
+- **Example**: `!change_break 14:00`
+
+#### `!end_break`
+- **Description**: Manually end the current break.
+- **Permissions**: Admin or authorized users.
+- **Example**: `!end_break`
+
+#### `!break`
+- **Description**: Display the current break end time.
+- **Permissions**: All users.
+- **Example**: `!break`
+
+### User Management Commands
+
+#### `!add_permission <@user>`
+- **Description**: Grant a user permission to use admin commands.
+- **Permissions**: Admin only.
+- **Example**: `!add_permission @JohnDoe`
+
+#### `!remove_permission <@user>`
+- **Description**: Revoke a user's permission to use admin commands.
+- **Permissions**: Admin only.
+- **Example**: `!remove_permission @JohnDoe`
+
+#### `!show_permissions`
+- **Description**: List all users with special permissions.
+- **Permissions**: Admin only.
+- **Example**: `!show_permissions`
 
 ---
 
 ## Setup Instructions
 
-### 1. Clone the Repository
-Clone this repository to your local machine:
+### Prerequisites
+1. Python 3.8 or higher.
+2. Required Python packages:
+   - `discord.py`
+   - `python-dotenv`
+3. A Discord bot token from the [Discord Developer Portal](https://discord.com/developers/applications).
+4. A `.env` file containing your bot token:
+   ```env
+   DISCORD_TOKEN=your_bot_token_here
+   ```
 
-```bash
-git clone https://github.com/yourusername/discord_break_bot.git
-cd discord_break_bot
-2. Set Up a Virtual Environment
-Create a virtual environment to manage dependencies:
+### Virtual Environment
+It is recommended to use a virtual environment to manage dependencies:
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+2. Activate the virtual environment:
+   - **Windows**: `venv\Scripts\activate`
+   - **Mac/Linux**: `source venv/bin/activate`
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-3. Install Dependencies
-Install the required Python packages:
+### Running the Bot
+1. Clone the repository or copy the bot's source code.
+2. Navigate to the bot's directory in your terminal.
+3. Ensure your `.env` file is properly set up with your bot token:
+   ```env
+   DISCORD_TOKEN=your_bot_token_here
+   ```
+4. Run the bot:
+   ```bash
+   python main.py
+   ```
 
-pip install -r requirements.txt
-4. Create .env File
-Create a .env file in the root of your project with the following content:
+---
 
-DISCORD_TOKEN=your-discord-bot-token
-Replace your-discord-bot-token with your bot's actual token.
+## How It Works
+1. The bot uses `discord.py` and listens for commands prefixed with `!`.
+2. Authorized users can manage breaks, while regular users can only view break times.
+3. The bot automatically sends reminders and announcements based on the set break time.
 
-5. Running the Bot
-Run the bot after setting up the .env file:
+---
 
-python main.py
-Commands
+## Notes
+1. Ensure the bot has the necessary permissions to read and send messages in your desired channel.
+2. Replace `general` in the code with the name of the channel you want the bot to post reminders in.
 
-Admin Commands
-1. !break_time HH:MM
+---
 
-Sets the break end time.
+## Troubleshooting
+- **Bot not responding to commands:**
+  1. Check that the bot is online.
+  2. Verify the bot's permissions in your Discord server.
+  3. Ensure the command prefix is correct (`!`).
 
-Example: !break_time 13:30
-Response: "Break time is set to 13:30."
-2. !change_break HH:MM
+- **Environment variables not loading:**
+  1. Ensure `.env` is in the same directory as the bot.
+  2. Verify the `DISCORD_TOKEN` key and value.
 
-Changes the break end time.
+---
 
-Example: !change_break 14:00
-Response: "Break time has been changed to 14:00."
-3. !end_break
-
-Ends the break manually.
-
-Response: "The break has been ended."
-4. !add_permission @user
-
-Grants a user permission to use admin commands.
-
-Response: "@user has been granted permission."
-5. !remove_permission @user
-
-Removes a user’s permission to use admin commands.
-
-Response: "@user's permission has been removed."
-6. !show_permissions
-
-Displays a list of users with admin permissions.
-
-Response: "Authorized users: @user1, @user2."
-User Commands
-1. !break
-
-Displays the current break end time.
-
-Example: !break
-Response: "The break ends at 13:30." or "No break is currently set."
-Example Usage
-
-Admin: !break_time 13:30
-Bot: "Break time is set to 13:30."
-
-Admin: !change_break 14:00
-Bot: "Break time has been changed to 14:00."
-
-User: !break
-Bot: "The break ends at 14:00."
-
-Admin: !end_break
-Bot: "The break has been ended."
-
-Admin: !add_permission @user
-Bot: "@user has been granted permission."
-
-Admin: !remove_permission @user
-Bot: "@user's permission has been removed."
-
-Notes
-
-Break times must be provided in a 24-hour format (HH:MM).
-The bot sends reminders 5 minutes before a break ends.
-Users can actively check break status using the !break command.
-Only admins or authorized users can set, modify, or end breaks.
-License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+## License
+This bot is provided under the MIT License. Feel free to modify and use it as needed.
